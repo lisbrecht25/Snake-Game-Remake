@@ -4,25 +4,23 @@ import random
 
 pygame.init()
 Width, Height = 600, 600
+dx, dy = 20, 0
 
 screen = pygame.display.set_mode((Width, Height))
 pygame.display.set_caption("Snake Game Remake")
 clock = pygame.time.Clock()
 run = True
 
-appleX = random.randrange(20, 580, 20)
-appleY = random.randrange(20, 580, 20)
+appleX, appleY = random.randrange(20, 580, 20), random.randrange(20, 580, 20)
 pygame.draw.rect(screen, (255, 0, 0), (appleX, appleY, 20, 20))
-appleSpawned = True
+appleEaten = False
 
-snakeHeadX = random.randrange(60, 540, 20)
-snakeHeadY = random.randrange(60, 540, 20)
-snake = [(snakeHeadX, snakeHeadY, 20, 20), (snakeHeadX - 20, snakeHeadY, 20, 20), (snakeHeadX - 40, snakeHeadY, 20, 20)]
+snakeHeadX, snakeHeadY = random.randrange(60, 540, 20), random.randrange(60, 540, 20)
+snake = [[snakeHeadX, snakeHeadY], (snakeHeadX - 20, snakeHeadY), (snakeHeadX - 40, snakeHeadY)]
 for i in range(0, len(snake)):
-    pygame.draw.rect(screen, (0,255, 0), snake[i])
-direction = "right"
-dx = 20
-dy = 0
+    x, y = snake[i]
+    pygame.draw.rect(screen, (0,255, 0), (x, y, 20, 20))
+
 
 while run:
       
@@ -45,13 +43,26 @@ while run:
                 dx = 20
                 dy = 0
 
-    snakeHeadX, snakeHeadY, a, b = snake[0]
-    snakeHeadX = snakeHeadX + dx
-    snakeHeadY = snakeHeadY + dy
-    snake.insert(0, (snakeHeadX, snakeHeadY, 20, 20))
-    pygame.draw.rect(screen, (0, 0, 0), snake[-1])
-    pygame.draw.rect(screen, (0,255, 0), snake[0])
-    lastSegement = snake.pop()
+    snakeX, snakeY, *_ = snake[0]
+
+    if snakeX == appleX and snakeY == appleY:
+        appleX, appleY = random.randrange(0, 600, 20), random.randrange(0, 600, 20)
+        print(appleX, appleY)
+        pygame.draw.rect(screen, (255, 0, 0), (appleX, appleY, 20, 20))
+        appleEaten = True
+        print("APPLE EATEN")
+
+    snakeX = snakeX + dx
+    snakeY = snakeY + dy
+    snake.insert(0, (snakeX, snakeY, 20, 20))
+    pygame.draw.rect(screen, (0,255, 0), (snakeX, snakeY, 20, 20))
     
+    if appleEaten != True:
+        lastSegement = snake.pop()
+        x, y, *_ = lastSegement
+        pygame.draw.rect(screen, (0, 0, 0), (x, y, 20, 20))
+        print("NO APPLE EATEN")
+    
+    appleEaten = False
     pygame.display.flip()
     clock.tick(10)
